@@ -20,8 +20,8 @@ module.exports = {
             const response = await result.response;
             const text = response.text();
             message.reply(text)
-        }).catch(() => {
-            message.reply('Modelo sobrecargado, intenta de nuevo mas tarde.')
+        }).catch((err) => {
+            message.reply(err.message)
         });
 
     }

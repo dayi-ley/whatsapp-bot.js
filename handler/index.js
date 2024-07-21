@@ -1,5 +1,6 @@
 const { glob } = require("glob");
 const { Client } = require('whatsapp-web.js')
+const path = require('path')
 
 /**
  * @param {Client} client
@@ -10,7 +11,7 @@ module.exports = async (client) => {
     const commandFiles = await glob(`${process.cwd()}/commands/**/*.js`);
     commandFiles.map((value) => {
         const file = require(value);
-        const splitted = value.split("/");
+        const splitted = value.split(path.sep);
         const directory = splitted[splitted.length - 2];
 
         if (file.name) {
