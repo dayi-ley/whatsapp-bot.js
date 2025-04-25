@@ -35,3 +35,15 @@ require('dotenv').config();
  }
  
  client.initialize();
+client.on('message', async (message) => {
+    // Ignorar mensajes propios o de otros bots
+    if (message.fromMe) return;
+
+    // Procesar comandos
+    for (const [name, cmd] of client.commands) {
+        if (message.body.startsWith(`!${name}`)) {
+            await cmd.run(client, message);
+            break;
+        }
+    }
+});
