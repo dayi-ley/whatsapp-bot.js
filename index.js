@@ -1,32 +1,37 @@
-client.on('ready', () => {
-  console.log('✅ Bot listo. Datos de sesión:', {
-    pushname: client.info?.pushname,
-    platform: client.info?.platform,
-    battery: client.info?.battery
-  });
-});
-
-// Debug de conexión
-client.on('change_state', state => {
-  console.log('🔄 Estado de conexión:', state);
-});
-
-// Manejo explícito de mensajes
-client.on('message', async (msg) => {
-  try {
-    console.log(`📩 Mensaje de ${msg.from}: ${msg.body}`);
-    
-    const prefix = process.env.PREFIX || '!';
-    if (!msg.body.startsWith(prefix)) return;
-
-    const [cmd, ...args] = msg.body.slice(prefix.length).split(/ +/);
-    const command = client.commands?.[cmd.toLowerCase()];
-
-    if (command) {
-      console.log(`⚡ Ejecutando comando: ${command.name}`);
-      await command.execute(client, msg, args);
-    }
-  } catch (error) {
-    console.error('Error procesando mensaje:', error);
-  }
-});
+require('dotenv').config();
+ const { Client, LocalAuth } = require('whatsapp-web.js');
+ 
+ const client = new Client({
+   authStrategy: new LocalAuth(),
+   puppeteer: {
+     args: [
+       '--no-sandbox',
+       '--disable-setuid-sandbox',
+       '--disable-dev-shm-usage',
+       '--single-process'
+     ]
+   }
+ });
+ 
+ // QR sin dependencias externas
+ // QR sin dependencias adicionales
+ client.on('qr', qr => {
+   console.log('🔍 Escanea este QR con WhatsApp:');
+   console.log('🔍 Escanea este QR con WhatsApp Web:');
+   console.log(`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(qr)}`);
+   console.log('Código QR alternativo:', qr);
+ });
+ 
+ client.on('ready', () => {
+   console.log('✅ Bot conectado correctamente');
+   console.log('✅ Bot listo para recibir mensajes');
+ });
+ 
+ // Carga handlers
+ try {
+   require('./handler/index')(client);
+ } catch (error) {
+   console.error('Error cargando handlers:', error);
+ }
+ 
+ client.initialize();
