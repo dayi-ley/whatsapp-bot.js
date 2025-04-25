@@ -1,23 +1,26 @@
-const { Client } = require('whatsapp-web.js');
-
 module.exports = {
     name: 'sticker',
     aliases: ['st'],
-    /** 
-     * @param {Client} client 
-     * @param {} message 
-     * @param {String[]} args 
+    /**
+     * @param {Client} client
+     * @param {Message} message
+     * @param {String[]} args
      */
-    run: async(client, message, args) => {
-        if (!message.hasQuotedMsg) return message.reply('Responda a una imagen para convertirla en sticker.')
+    execute: async (client, message, args) => {
+        if (!message.hasQuotedMsg) {
+            return message.reply('Responde a una imagen para convertirla en sticker.');
+        }
 
-        const quotedMessage = await message.getQuotedMessage()
+        try {
+            const quotedMessage = await message.getQuotedMessage();
+            if (!quotedMessage.hasMedia) {
+                return message.reply('El mensaje citado no contiene medios.');
+            }
 
-        if (!quotedMessage.hasMedia) return message.reply('El mensaje no tiene una imagen.')
-
-        const media = await quotedMessage.downloadMedia()
-
-        message.reply(media, null, { sendMediaAsSticker: true })
-
+            const media = await quotedMessage.downloadMedia();
+            await message.reply(media, null, { sendMediaAsSticker: true });
+        } catch (err) {
+            await message.reply(`Error al crear sticker: ${err.message}`);
+        }
     }
-}
+};
