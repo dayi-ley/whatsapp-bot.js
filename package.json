@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js", 
+    "start": "node index.js", // Necesario para Render
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,7 +15,6 @@
     "axios": "^1.6.7",
     "dotenv": "^16.4.1",
     "glob": "^10.3.10",
-    "qrcode": "^1.5.3",
     "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#webpack-exodus"
   }
 }
