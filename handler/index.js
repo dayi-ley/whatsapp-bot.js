@@ -2,29 +2,27 @@ const { glob } = require("glob");
 const path = require('path');
 
 module.exports = async (client) => {
-    // Inicialización segura
-    if (!client.commands) {
-        client.commands = {};
-    }
+    // Inicialización de comandos (adaptado para WhatsApp)
+    if (!client.commands) client.commands = new Map();
 
     // Carga de comandos
     const commandFiles = await glob(`${process.cwd()}/commands/**/*.js`);
     
-    commandFiles.forEach((filePath) => {
+    for (const filePath of commandFiles) {
         const command = require(filePath);
-        const splitted = filePath.split(path.sep);
-        const directory = splitted[splitted.length - 2];
-
-        if (command.name) {
-            // Usamos asignación de objeto en lugar de push
-            client.commands[command.name] = {
-                ...command,
-                directory
-            };
+        if (command.name && command.run) {
+            client.commands.set(command.name, command);
+            console.log(`✅ Comando cargado: ${command.name}`);
         }
-    });
+    }
 
-    // Carga de eventos
+    // Carga de eventos (opcional)
     const eventFiles = await glob(`${process.cwd()}/events/*.js`);
-    eventFiles.forEach((file) => require(file));
+    for (const file of eventFiles) {
+        const event = require(file);
+        if (event.name && event.run) {
+            client.on(event.name, (...args) => event.run(client, ...args));
+            console.log(`✅ Evento cargado: ${event.name}`);
+        }
+    }
 };
