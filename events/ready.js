@@ -1,6 +1,8 @@
-const client = require('../index')
-const { Events } = require('whatsapp-web.js')
+const { Events } = require('whatsapp-web.js');
 
-client.on(Events.READY, () => {
-    console.log(`Bot listo y en linea.`);
-})
+module.exports = {
+    name: Events.READY,
+    execute: (client) => {
+        console.log(`✅ Bot listo como ${client.info.pushname || 'Usuario'}`);
+    }
+};
