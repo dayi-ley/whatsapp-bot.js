@@ -1,36 +1,22 @@
-const client = require('../index')
-const { Events } = require('whatsapp-web.js')
+const { Events } = require('whatsapp-web.js');
 
-client.on(Events.MESSAGE_RECEIVED, async (msg) => {
+module.exports = {
+    name: Events.MESSAGE_RECEIVED,
+    execute: (client, msg) => {
+        const prefix = process.env.PREFIX || '!';
+        
+        if (msg.body.startsWith(prefix)) {
+            const [cmd, ...args] = msg.body
+                .slice(prefix.length)
+                .trim()
+                .split(/ +/g);
 
-    const prefix = process.env.PREFIX
-    
-    if (msg.body.startsWith(prefix)) {
-        const [cmd, ...args] = msg.body
-        .slice(prefix.length)
-        .trim()
-        .split(/ +/g)
+            const command = client.commands[cmd] || 
+                Object.values(client.commands).find(c => c.aliases?.includes(cmd));
 
-        const command = client.commands.find(c => c.name === cmd) || client.commands.find(c => c.aliases?.includes(cmd))
-
-        if (!command) return;
-        await command.run(client, msg, args)
+            if (command) {
+                command.execute(client, msg, args);
+            }
+        }
     }
-})
-
-client.on(Events.MESSAGE_CREATE, async (msg) => {
-
-    const prefix = process.env.PREFIX
-
-    if (msg.body.startsWith(prefix)) {
-        const [cmd, ...args] = msg.body
-        .slice(prefix.length)
-        .trim()
-        .split(/ +/g)
-
-        const command = client.commands.find(c => c.name === cmd) || client.commands.find(c => c.aliases?.includes(cmd))
-
-        if (!command) return;
-        await command.run(client, msg, args)
-    }
-})
+};
