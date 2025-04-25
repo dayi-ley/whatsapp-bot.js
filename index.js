@@ -3,10 +3,11 @@ require('dotenv').config();
 
 const wwebVersion = "2.2412.54";
 
+// Inicializa el cliente
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox'] // Requerido para Render
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     },
     webVersionCache: {
         type: 'remote',
@@ -14,20 +15,22 @@ const client = new Client({
     }
 });
 
-// QR como URL (fácil de escanear desde móvil)
+// Inicializa commands como objeto ANTES de los handlers
+client.commands = {};  // Objeto en lugar de Map para compatibilidad
+
+// Handler QR mejorado
 client.on('qr', (qr) => {
-    console.log('🔍 Escanea este QR con WhatsApp Web:');
+    console.log('🔍 Escanea este QR:');
     console.log(`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(qr)}`);
-    console.log(`⚠️ Si el enlace no funciona, copia este código manualmente:\n${qr}`);
 });
 
-// Handler de comandos (sin cambios)
+// Carga los handlers
 require('./handler/index')(client);
 
-// Servidor HTTP mínimo para Render
+// Servidor HTTP para Render
 require('http').createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Bot activo. Este endpoint es solo para Render.');
+    res.end('Bot activo');
 }).listen(process.env.PORT || 3000);
 
 client.initialize();
