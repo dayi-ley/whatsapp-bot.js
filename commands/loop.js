@@ -12,8 +12,13 @@ module.exports = {
         const times = parseInt(args[0]);
         const msg = args.slice(1).join(' ');
 
-        if (isNaN(times) return message.reply('El primer argumento debe ser un número.');
-        if (times > 10) return message.reply('Máximo 10 repeticiones por seguridad.');
+        if (isNaN(times)) {  // ← Corregí esta línea
+            return message.reply('El primer argumento debe ser un número.');
+        }
+
+        if (times > 10) {
+            return message.reply('Máximo 10 repeticiones por seguridad.');
+        }
 
         for (let i = 0; i < times; i++) {
             await message.reply(msg);
