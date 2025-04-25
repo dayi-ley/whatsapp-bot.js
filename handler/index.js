@@ -1,26 +1,30 @@
 const { glob } = require("glob");
-const { Client } = require('whatsapp-web.js')
-const path = require('path')
-
-/**
- * @param {Client} client
-**/
+const path = require('path');
 
 module.exports = async (client) => {
-    // Commands
+    // Inicialización segura
+    if (!client.commands) {
+        client.commands = {};
+    }
+
+    // Carga de comandos
     const commandFiles = await glob(`${process.cwd()}/commands/**/*.js`);
-    commandFiles.map((value) => {
-        const file = require(value);
-        const splitted = value.split(path.sep);
+    
+    commandFiles.forEach((filePath) => {
+        const command = require(filePath);
+        const splitted = filePath.split(path.sep);
         const directory = splitted[splitted.length - 2];
 
-        if (file.name) {
-            const properties = { directory, ...file };
-            client.commands.push(file.name, properties);
+        if (command.name) {
+            // Usamos asignación de objeto en lugar de push
+            client.commands[command.name] = {
+                ...command,
+                directory
+            };
         }
     });
 
-    // Events
+    // Carga de eventos
     const eventFiles = await glob(`${process.cwd()}/events/*.js`);
-    eventFiles.map((value) => require(value));
-}
+    eventFiles.forEach((file) => require(file));
+};
